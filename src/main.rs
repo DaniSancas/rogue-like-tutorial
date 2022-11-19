@@ -1,6 +1,6 @@
-use rltk::{Rltk, GameState};
+use rltk::{GameState, Rltk};
 
-struct State{}
+struct State {}
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
@@ -13,9 +13,9 @@ fn main() -> rltk::RltkError {
     use rltk::RltkBuilder;
 
     let context = RltkBuilder::simple80x50()
-    .with_title("Roguelike Tutorial")
-    .build()?;
+        .with_title("Roguelike Tutorial")
+        .build()?;
 
-    let gs = State{ };
+    let gs = State {};
     rltk::main_loop(context, gs)
 }
