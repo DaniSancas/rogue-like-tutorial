@@ -54,10 +54,15 @@ struct Player {}
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
+    let map = ecs.fetch::<Vec<TileType>>();
 
     for (_player, pos) in (&mut players, &mut positions).join() {
-        pos.x = min(MAX_WIDTH - 1, max(0, pos.x + delta_x));
-        pos.y = min(MAX_HEIGHT - 1, max(0, pos.y + delta_y));
+        let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);
+
+        if map[destination_idx] != TileType::Wall {
+            pos.x = min(MAX_WIDTH - 1, max(0, pos.x + delta_x));
+            pos.y = min(MAX_HEIGHT - 1, max(0, pos.y + delta_y));
+        }
     }
 }
 
@@ -102,7 +107,7 @@ fn new_map() -> Vec<TileType> {
     // First, obtain the thread-local RNG:
     let mut rng = rltk::RandomNumberGenerator::new();
 
-    for _i in 0..(MAX_WIDTH * MAX_HEIGHT) {
+    for _i in 0..(MAX_WIDTH * MAX_HEIGHT / 10) {
         let x = rng.roll_dice(1, MAX_WIDTH - 1);
         let y = rng.roll_dice(1, MAX_HEIGHT - 1);
         let idx = xy_idx(x, y);
