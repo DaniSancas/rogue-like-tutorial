@@ -3,7 +3,7 @@ use rltk::{Rltk, RGB};
 pub const MAX_WIDTH: i32 = 80;
 pub const MAX_HEIGHT: i32 = 50;
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum TileType {
     Wall,
     Floor,
