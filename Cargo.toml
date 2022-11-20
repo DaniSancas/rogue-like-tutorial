@@ -10,3 +10,6 @@ rltk = "*"
 fontconfig = "*"
 specs = "*"
 specs-derive = "*"
+
+[dev-dependencies]
+rstest = "*"
