@@ -1,7 +1,9 @@
 use rltk::{GameState, Rltk, VirtualKeyCode, RGB};
 use specs::prelude::*;
-use specs_derive::Component;
 use std::cmp::{max, min};
+
+mod component;
+pub use component::*;
 
 const MAX_WIDTH: i32 = 80;
 const MAX_HEIGHT: i32 = 50;
@@ -35,21 +37,6 @@ impl State {
     }
 }
 
-#[derive(Component)]
-struct Position {
-    x: i32,
-    y: i32,
-}
-
-#[derive(Component)]
-struct Renderable {
-    glyph: rltk::FontCharType,
-    fg: RGB,
-    bg: RGB,
-}
-
-#[derive(Component, Debug)]
-struct Player {}
 
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
