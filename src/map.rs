@@ -13,7 +13,10 @@ pub const fn xy_idx(x: i32, y: i32) -> usize {
     (y as usize * MAX_WIDTH as usize) + x as usize
 }
 
-pub fn new_map() -> Vec<TileType> {
+/// Makes a map with solid boundaries and 40 randomly placed walls.
+///
+/// No guarantees that it won't look awful.
+pub fn new_map_test() -> Vec<TileType> {
     let mut map = vec![TileType::Floor; MAX_WIDTH as usize * MAX_HEIGHT as usize];
 
     // Make the boundaries walls
@@ -39,6 +42,12 @@ pub fn new_map() -> Vec<TileType> {
             map[idx] = TileType::Wall;
         }
     }
+
+    map
+}
+
+pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
+    let map = vec![TileType::Wall; MAX_WIDTH as usize * MAX_HEIGHT as usize];
 
     map
 }
