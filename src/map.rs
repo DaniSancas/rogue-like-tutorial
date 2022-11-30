@@ -1,4 +1,7 @@
 use rltk::{Rltk, RGB};
+use std::cmp::{max, min};
+
+use super::rect::Rect;
 
 pub const MAX_WIDTH: i32 = 80;
 pub const MAX_HEIGHT: i32 = 50;
@@ -47,7 +50,15 @@ pub fn new_map_test() -> Vec<TileType> {
 }
 
 pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
-    let map = vec![TileType::Wall; MAX_WIDTH as usize * MAX_HEIGHT as usize];
+    let mut map = vec![TileType::Wall; MAX_WIDTH as usize * MAX_HEIGHT as usize];
+
+    let room1 = Rect::new(20, 15, 10, 15);
+    let room2 = Rect::new(35, 15, 10, 15);
+
+    apply_room_to_map(&room1, &mut map);
+    apply_room_to_map(&room2, &mut map);
+
+    apply_horizontal_tunnel(&mut map, 25, 40, 23);
 
     map
 }
@@ -80,5 +91,32 @@ pub fn draw_map(map: &[TileType], ctx: &mut Rltk) {
             x = 0;
             y += 1;
         }
+    }
+}
+
+fn apply_room_to_map(room: &Rect, map: &mut [TileType]) {
+    for y in room.y1 + 1..=room.y2 {
+        for x in room.x1 + 1..=room.x2 {
+            map[xy_idx(x, y)] = TileType::Floor;
+        }
+    }
+}
+
+fn apply_horizontal_tunnel(map: &mut [TileType], x1: i32, x2: i32, y: i32) {
+    for x in min(x1, x2)..=max(x1, x2) {
+        apply_floor_tile(map, x, y);
+    }
+}
+
+fn apply_vertical_tunnel(map: &mut [TileType], y1: i32, y2: i32, x: i32) {
+    for y in min(y1, y2)..=max(y1, y2) {
+        apply_floor_tile(map, x, y);
+    }
+}
+
+fn apply_floor_tile(map: &mut [TileType], x: i32, y: i32) {
+    let idx = xy_idx(x, y);
+    if idx > 0 && idx < MAX_WIDTH as usize * MAX_HEIGHT as usize {
+        map[idx] = TileType::Floor;
     }
 }
