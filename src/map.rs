@@ -1,4 +1,4 @@
-use rltk::{Rltk, RGB};
+use rltk::{RandomNumberGenerator, Rltk, RGB};
 use std::cmp::{max, min};
 
 use super::rect::Rect;
@@ -50,15 +50,50 @@ pub fn new_map_test() -> Vec<TileType> {
 }
 
 pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
+    const MAX_ROOMS: i32 = 30;
+    const MIN_SIZE: i32 = 6;
+    const MAX_SIZE: i32 = 10;
+    
     let mut map = vec![TileType::Wall; MAX_WIDTH as usize * MAX_HEIGHT as usize];
 
-    let room1 = Rect::new(20, 15, 10, 15);
-    let room2 = Rect::new(35, 15, 10, 15);
+    let mut rooms: Vec<Rect> = Vec::new();
 
-    apply_room_to_map(&room1, &mut map);
-    apply_room_to_map(&room2, &mut map);
 
-    apply_horizontal_tunnel(&mut map, 25, 40, 23);
+    let mut rng = RandomNumberGenerator::new();
+
+    for _ in 0..MAX_ROOMS {
+        let w = rng.range(MIN_SIZE, MAX_SIZE);
+        let h = rng.range(MIN_SIZE, MAX_SIZE);
+        let x: i32 = rng.roll_dice(1, MAX_WIDTH - w - 1) - 1;
+        let y: i32 = rng.roll_dice(1, MAX_HEIGHT - h - 1) - 1;
+        let new_room = Rect::new(x, y, w, h);
+
+        let mut ok = true;
+        for other_room in &rooms {
+            if new_room.intersect(other_room) {
+                ok = false;
+            }
+        }
+
+        if ok {
+            apply_room_to_map(&new_room, &mut map);
+
+            if !rooms.is_empty() {
+                let (new_x, new_y) = new_room.center();
+                let (prev_x, prev_y) = rooms[rooms.len() - 1].center();
+                if rng.range(0, 2) == 1 {
+                    apply_horizontal_tunnel(&mut map, prev_x, new_x, prev_y);
+                    apply_vertical_tunnel(&mut map, prev_y, new_y, new_x);
+                } else {
+                    apply_vertical_tunnel(&mut map, prev_y, new_y, prev_x);
+                    apply_horizontal_tunnel(&mut map, prev_x, new_x, new_y);
+
+                }
+            }
+
+            rooms.push(new_room);
+        }
+    }
 
     map
 }
